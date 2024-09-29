@@ -80,8 +80,18 @@ export default function Home() {
           description: "The image is being generated. Please wait...",
         });
         
-        // Poll for the result
+        let attempts = 0;
+        const maxAttempts = 60; // Stop after 1 minute (30 * 2 seconds)
+
         const pollInterval = setInterval(async () => {
+          if (attempts >= maxAttempts) {
+            clearInterval(pollInterval);
+            setError("Image generation timed out. Please try again.");
+            setIsLoading(false);
+            return;
+          }
+
+          attempts++;
           const statusResponse = await fetch(`/api/predictions?requestId=${result.requestId}`);
           const statusResult = await statusResponse.json();
 

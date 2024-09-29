@@ -49,6 +49,9 @@ export async function POST(request) {
   // Generate a unique ID for this request
   const requestId = Date.now().toString();
 
+  console.log(`Starting request for prompt: ${prompt}`);
+  const startTime = Date.now();
+
   // Start the image generation process without waiting for it to complete
   fetch(HF_API_URL, {
     method: "POST",
@@ -58,6 +61,9 @@ export async function POST(request) {
     },
     body: JSON.stringify({ inputs: prompt }),
   }).then(async (response) => {
+    const endTime = Date.now();
+    console.log(`Hugging Face API responded in ${endTime - startTime}ms`);
+
     if (response.ok) {
       const result = await response.arrayBuffer();
       const base64 = Buffer.from(result).toString('base64');
@@ -67,10 +73,12 @@ export async function POST(request) {
       global.results[requestId] = { status: 'completed', data: `data:image/jpeg;base64,${base64}` };
     } else {
       const error = await response.json();
+      console.error(`Error from Hugging Face API: ${JSON.stringify(error)}`);
       global.results = global.results || {};
       global.results[requestId] = { status: 'error', error: error.error };
     }
   }).catch((error) => {
+    console.error(`Fetch error: ${error.message}`);
     global.results = global.results || {};
     global.results[requestId] = { status: 'error', error: error.message };
   });
@@ -91,8 +99,11 @@ export async function GET(request) {
   const result = global.results && global.results[requestId];
 
   if (!result) {
-    return NextResponse.json({ status: 'processing' }, { status: 202 });
+    console.log(`No result found for requestId: ${requestId}`);
+    return NextResponse.json({ status: 'processing', message: 'Request is still processing' }, { status: 202 });
   }
+
+  console.log(`Result for requestId ${requestId}: ${JSON.stringify(result)}`);
 
   if (result.status === 'completed') {
     return NextResponse.json({ status: 'completed', output: [result.data] }, { status: 200 });
