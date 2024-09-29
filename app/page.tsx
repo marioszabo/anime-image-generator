@@ -64,44 +64,53 @@ export default function Home() {
     setPrediction(null)
 
     try {
-      // Send a POST request to the API to generate an image
       const response = await fetch("/api/predictions", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          prompt,
-          // enhance_prompt: enhancePrompt,
-        }),
-      })
-      const result = await response.json()
-      if (response.status !== 201) {
-        setError(result.detail)
+        body: JSON.stringify({ prompt }),
+      });
+      const result = await response.json();
+
+      if (response.status === 202) {
+        // The request is processing
         toast({
-          title: "Error",
-          description: result.detail.includes("loading") 
-            ? "The model is currently loading. Please try again in a few moments." 
-            : result.detail,
-          variant: "destructive",
-        })
-        return
+          title: "Processing",
+          description: "The image is being generated. Please wait...",
+        });
+        
+        // Poll for the result
+        const pollInterval = setInterval(async () => {
+          const statusResponse = await fetch(`/api/predictions?requestId=${result.requestId}`);
+          const statusResult = await statusResponse.json();
+
+          if (statusResult.status === 'completed') {
+            clearInterval(pollInterval);
+            setPrediction(statusResult);
+            setGeneratedImages(prev => [{ url: statusResult.output[0], prompt }, ...prev]);
+            toast({
+              title: "Success",
+              description: "Your image has been generated!",
+            });
+            setIsLoading(false);
+          } else if (statusResult.status === 'error') {
+            clearInterval(pollInterval);
+            throw new Error(statusResult.detail);
+          }
+        }, 2000); // Poll every 2 seconds
+      } else {
+        throw new Error("Unexpected response from server");
       }
-      setPrediction(result)
-      setGeneratedImages(prev => [{ url: result.output[0], prompt }, ...prev])
-      toast({
-        title: "Success",
-        description: "Your image has been generated!",
-      })
     } catch (err) {
-      setError("An unexpected error occurred")
+      console.error("Error in handleSubmit:", err);
+      setError(err.message || "An unexpected error occurred");
       toast({
         title: "Error",
-        description: "An unexpected error occurred",
+        description: err.message || "An unexpected error occurred",
         variant: "destructive",
-      })
-    } finally {
-      setIsLoading(false)
+      });
+      setIsLoading(false);
     }
   }
 
