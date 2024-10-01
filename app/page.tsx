@@ -316,7 +316,7 @@ export default function Home() {
 
         {/* Updated Footer */}
         <footer className="mt-12 text-center text-sm text-gray-400">
-          <p>
+          {/* <p>
             Powered by the{" "}
             <a 
               href="https://huggingface.co/brushpenbob/flux-midjourney-anime" 
@@ -327,6 +327,17 @@ export default function Home() {
               brushpenbob/flux-midjourney-anime
             </a>{" "}
             model from Hugging Face
+          </p> */}
+          <p>
+            Created by{" "}
+            <a 
+              href="https://mario-website-1.vercel.app/" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="underline hover:text-white transition-colors"
+            >
+              Mario Szabo
+            </a>
           </p>
           <p className="mt-2">
             Total images generated: {totalImagesGenerated}
