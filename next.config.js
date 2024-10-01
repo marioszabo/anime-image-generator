@@ -5,7 +5,9 @@ const nextConfig = {
     images: {
         domains: ['replicate.delivery'],
     },
-    // Remove the experimental section if there are no other experimental features
+    experimental: {
+        serverComponentsExternalPackages: ['@vercel/kv'],
+    },
     // ... other configurations
 }
 

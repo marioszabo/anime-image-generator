@@ -33,6 +33,7 @@ export default function Home() {
   const [selectedTemplate, setSelectedTemplate] = useState("")
   const [generatedImages, setGeneratedImages] = useState<Array<{ url: string, prompt: string }>>([])
   const [isTutorialOpen, setIsTutorialOpen] = useState(false)
+  const [totalImagesGenerated, setTotalImagesGenerated] = useState<number>(0)
 
   // Load saved images from local storage on component mount
   useEffect(() => {
@@ -46,6 +47,21 @@ export default function Home() {
   useEffect(() => {
     localStorage.setItem('generatedImages', JSON.stringify(generatedImages))
   }, [generatedImages])
+
+  // New useEffect to fetch total images generated
+  useEffect(() => {
+    const fetchTotalImages = async () => {
+      try {
+        const response = await fetch("/api/predictions");
+        const data = await response.json();
+        setTotalImagesGenerated(data.totalImages);
+      } catch (error) {
+        console.error("Error fetching total images:", error);
+      }
+    };
+
+    fetchTotalImages();
+  }, []);
 
   // Handle template selection and update the prompt
   const handleTemplateChange = (value: string) => {
@@ -298,7 +314,7 @@ export default function Home() {
         {/* Tutorial modal */}
         <TutorialModal isOpen={isTutorialOpen} onClose={() => setIsTutorialOpen(false)} />
 
-        {/* Footer */}
+        {/* Updated Footer */}
         <footer className="mt-12 text-center text-sm text-gray-400">
           <p>
             Powered by the{" "}
@@ -311,6 +327,9 @@ export default function Home() {
               brushpenbob/flux-midjourney-anime
             </a>{" "}
             model from Hugging Face
+          </p>
+          <p className="mt-2">
+            Total images generated: {totalImagesGenerated}
           </p>
         </footer>
       </div>
