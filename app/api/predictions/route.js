@@ -5,7 +5,7 @@ import { NextResponse } from "next/server";
 const Hf = new HfInference(process.env.HUGGINGFACE_API_KEY);
 
 // URL for the Hugging Face API endpoint
-const MODEL_NAME = "black-forest-labs/FLUX.1-schnell";
+const MODEL_NAME = "brushpenbob/flux-midjourney-anime";
 
 export async function POST(request) {
   if (!process.env.HUGGINGFACE_API_KEY) {
