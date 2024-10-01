@@ -73,45 +73,16 @@ export default function Home() {
       });
       const result = await response.json();
 
-      if (response.status === 202) {
-        // The request is processing
-        toast({
-          title: "Processing",
-          description: "The image is being generated. Please wait...",
-        });
-        
-        let attempts = 0;
-        const maxAttempts = 60; // Stop after 1 minute (30 * 2 seconds)
-
-        const pollInterval = setInterval(async () => {
-          if (attempts >= maxAttempts) {
-            clearInterval(pollInterval);
-            setError("Image generation timed out. Please try again.");
-            setIsLoading(false);
-            return;
-          }
-
-          attempts++;
-          const statusResponse = await fetch(`/api/predictions?requestId=${result.requestId}`);
-          const statusResult = await statusResponse.json();
-
-          if (statusResult.status === 'completed') {
-            clearInterval(pollInterval);
-            setPrediction(statusResult);
-            setGeneratedImages(prev => [{ url: statusResult.output[0], prompt }, ...prev]);
-            toast({
-              title: "Success",
-              description: "Your image has been generated!",
-            });
-            setIsLoading(false);
-          } else if (statusResult.status === 'error') {
-            clearInterval(pollInterval);
-            throw new Error(statusResult.detail);
-          }
-        }, 2000); // Poll every 2 seconds
-      } else {
-        throw new Error("Unexpected response from server");
+      if (!response.ok) {
+        throw new Error(result.detail || "An error occurred");
       }
+
+      setPrediction(result);
+      setGeneratedImages(prev => [{ url: result.output[0], prompt }, ...prev]);
+      toast({
+        title: "Success",
+        description: "Your image has been generated!",
+      });
     } catch (err) {
       console.error("Error in handleSubmit:", err);
       setError(err.message || "An unexpected error occurred");
@@ -120,9 +91,10 @@ export default function Home() {
         description: err.message || "An unexpected error occurred",
         variant: "destructive",
       });
+    } finally {
       setIsLoading(false);
     }
-  }
+  };
 
   // Handle image download
   const handleDownload = (url: string, prompt: string) => {
