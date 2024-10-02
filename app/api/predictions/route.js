@@ -29,9 +29,21 @@ export async function POST(request) {
     const endTime = Date.now();
     console.log(`Hugging Face API responded in ${endTime - startTime}ms`);
 
-    // Convert the image to base64
-    const imageBuffer = await response.arrayBuffer();
-    const base64Image = Buffer.from(imageBuffer).toString('base64');
+    // Log the type and content of the response
+    console.log('Response type:', typeof response);
+    console.log('Response instanceof Blob:', response instanceof Blob);
+    console.log('Response content:', response);
+
+    let base64Image;
+    if (response instanceof ArrayBuffer) {
+      base64Image = Buffer.from(response).toString('base64');
+    } else if (response instanceof Blob) {
+      const arrayBuffer = await response.arrayBuffer();
+      base64Image = Buffer.from(arrayBuffer).toString('base64');
+    } else {
+      throw new Error(`Unexpected response type: ${typeof response}`);
+    }
+
     const dataUrl = `data:image/jpeg;base64,${base64Image}`;
 
     // Increment the total images generated count

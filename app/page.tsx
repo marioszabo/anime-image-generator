@@ -87,12 +87,13 @@ export default function Home() {
         },
         body: JSON.stringify({ prompt }),
       });
-      const result = await response.json();
-
+      
       if (!response.ok) {
-        throw new Error(result.detail || "An error occurred");
+        const errorData = await response.json();
+        throw new Error(errorData.detail || "An error occurred");
       }
 
+      const result = await response.json();
       setPrediction(result);
       setGeneratedImages(prev => [{ url: result.output[0], prompt }, ...prev]);
       toast({
