@@ -7,6 +7,7 @@ const Hf = new HfInference(process.env.HUGGINGFACE_API_KEY);
 
 // URL for the Hugging Face API endpoint
 const MODEL_NAME = "brushpenbob/flux-midjourney-anime";
+const TRIGGER_WORD = "egmid";
 
 export async function POST(request) {
   if (!process.env.HUGGINGFACE_API_KEY) {
@@ -14,8 +15,12 @@ export async function POST(request) {
   }
 
   try {
-    // Extract the prompt from the body of the request
-    const { prompt } = await request.json();
+    let { prompt } = await request.json();
+    
+    // Prepend the trigger word if it's not already there
+    if (!prompt.toLowerCase().startsWith(TRIGGER_WORD.toLowerCase())) {
+      prompt = `${TRIGGER_WORD}, ${prompt}`;
+    }
 
     console.log(`Starting request for prompt: ${prompt}`);
     const startTime = Date.now();

@@ -16,11 +16,11 @@ import { motion, AnimatePresence } from "framer-motion"
 
 // Define prompt templates for users to choose from
 const promptTemplates = [
-  { value: "anime_character", label: "Anime Character", prompt: "egmid, Create an anime character with [hair color] hair and [eye color] eyes, wearing [clothing style]" },
-  { value: "anime_landscape", label: "Anime Landscape", prompt: "egmid, Design an anime-style landscape featuring [location] with [weather condition]" },
-  { value: "anime_action", label: "Anime Action Scene", prompt: "egmid, Illustrate an action-packed anime scene with [character description] fighting [opponent description]" },
-  { value: "anime_emotion", label: "Emotional Anime Moment", prompt: "egmid, Depict an emotional anime scene where [character description] is feeling [emotion]" },
-  { value: "anime_food", label: "Anime Food", prompt: "egmid, Draw a mouth-watering anime-style [dish name] with [description of presentation]" },
+  { value: "anime_character", label: "Anime Character", prompt: "Create an anime character with [hair color] hair and [eye color] eyes, wearing [clothing style]" },
+  { value: "anime_landscape", label: "Anime Landscape", prompt: "Design an anime-style landscape featuring [location] with [weather condition]" },
+  { value: "anime_action", label: "Anime Action Scene", prompt: "Illustrate an action-packed anime scene with [character description] fighting [opponent description]" },
+  { value: "anime_emotion", label: "Emotional Anime Moment", prompt: "Depict an emotional anime scene where [character description] is feeling [emotion]" },
+  { value: "anime_food", label: "Anime Food", prompt: "Draw a mouth-watering anime-style [dish name] with [description of presentation]" },
 ]
 
 export default function Home() {
@@ -184,7 +184,7 @@ export default function Home() {
                     id="prompt"
                     value={prompt}
                     onChange={(e) => setPrompt(e.target.value)}
-                    placeholder="Start with 'egmid,' then enter a prompt to generate an image, or customize the template above"
+                    placeholder="Enter a prompt to generate an image, or customize the template above"
                     required
                     className="bg-white/20 text-white placeholder-gray-400"
                   />
