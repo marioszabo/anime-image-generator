@@ -34,6 +34,7 @@ export default function Home() {
   const [generatedImages, setGeneratedImages] = useState<Array<{ url: string, prompt: string }>>([])
   const [isTutorialOpen, setIsTutorialOpen] = useState(false)
   const [totalImagesGenerated, setTotalImagesGenerated] = useState<number>(0)
+  const [progress, setProgress] = useState(0)
 
   // Load saved images from local storage on component mount
   useEffect(() => {
@@ -93,13 +94,8 @@ export default function Home() {
         throw new Error(errorData.detail || "An error occurred");
       }
 
-      const result = await response.json();
-      setPrediction(result);
-      setGeneratedImages(prev => [{ url: result.output[0], prompt }, ...prev]);
-      toast({
-        title: "Success",
-        description: "Your image has been generated!",
-      });
+      const { jobId } = await response.json();
+      await pollJobStatus(jobId);
     } catch (err) {
       console.error("Error in handleSubmit:", err);
       setError(err.message || "An unexpected error occurred");
@@ -111,6 +107,36 @@ export default function Home() {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const pollJobStatus = async (jobId: string) => {
+    const maxAttempts = 120;
+    const interval = 3000;
+
+    for (let attempt = 0; attempt < maxAttempts; attempt++) {
+      const response = await fetch(`/api/predictions?jobId=${jobId}`);
+      const job = await response.json();
+
+      if (job.status === 'completed') {
+        setPrediction({ output: [job.output] });
+        setGeneratedImages(prev => [{ url: job.output, prompt }, ...prev]);
+        toast({
+          title: "Success",
+          description: "Your image has been generated!",
+        });
+        setProgress(0);
+        return;
+      } else if (job.status === 'failed') {
+        throw new Error(job.error || "Image generation failed");
+      } else if (job.status === 'pending') {
+        // Update progress based on attempt number
+        setProgress(Math.min((attempt / maxAttempts) * 100, 99));
+      }
+
+      await new Promise(resolve => setTimeout(resolve, interval));
+    }
+
+    throw new Error("Image generation timed out");
   };
 
   // Handle image download
