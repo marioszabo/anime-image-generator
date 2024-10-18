@@ -54,6 +54,9 @@ export default function Home() {
     const fetchTotalImages = async () => {
       try {
         const response = await fetch("/api/predictions");
+        if (!response.ok) {
+          throw new Error('Failed to fetch total images');
+        }
         const data = await response.json();
         setTotalImagesGenerated(data.totalImages);
       } catch (error) {
@@ -62,7 +65,7 @@ export default function Home() {
     };
 
     fetchTotalImages();
-  }, []);
+  }, [prediction]); // Add prediction as a dependency to refetch when a new image is generated
 
   // Handle template selection and update the prompt
   const handleTemplateChange = (value: string) => {

@@ -73,15 +73,17 @@ export async function GET(request) {
   const { searchParams } = new URL(request.url);
   const jobId = searchParams.get('jobId');
 
-  if (!jobId) {
-    return NextResponse.json({ detail: "jobId is required" }, { status: 400 });
+  if (jobId) {
+    const job = await kv.get(`job:${jobId}`);
+
+    if (!job) {
+      return NextResponse.json({ detail: "Job not found" }, { status: 404 });
+    }
+
+    return NextResponse.json(job);
+  } else {
+    // If no jobId is provided, return the total images generated
+    const totalImages = await kv.get('total_images_generated') || 0;
+    return NextResponse.json({ totalImages });
   }
-
-  const job = await kv.get(`job:${jobId}`);
-
-  if (!job) {
-    return NextResponse.json({ detail: "Job not found" }, { status: 404 });
-  }
-
-  return NextResponse.json(job);
 }
