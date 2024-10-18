@@ -19,6 +19,7 @@ export default function RootLayout({
       <body className="h-full">
         {children}
         <Toaster />
+        <Analytics />
       </body>
     </html>
   )
