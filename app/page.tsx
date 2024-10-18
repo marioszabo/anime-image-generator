@@ -358,12 +358,12 @@ export default function Home() {
           <p>
             Created by{" "}
             <a 
-              href="https://mario-website-1.vercel.app/" 
+              href="https://x.com/mrioszbo" 
               target="_blank" 
               rel="noopener noreferrer"
               className="underline hover:text-white transition-colors"
             >
-              Mario Szabo
+              Mario
             </a>
           </p>
           <p className="mt-2">
