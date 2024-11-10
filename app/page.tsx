@@ -361,7 +361,7 @@ export default function Home() {
           <p>
             Created by{" "}
             <a 
-              href="https://x.com/mrioszbo" 
+              href="" 
               target="_blank" 
               rel="noopener noreferrer"
               className="underline hover:text-white transition-colors"
